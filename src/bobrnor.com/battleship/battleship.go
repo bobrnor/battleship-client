@@ -8,12 +8,10 @@ import (
 
 func main() {
 
-	for i := 0; i < 1000000; i++ {
-		_, err := grid.Generate()
-		if err != nil {
-			fmt.Printf("%+v\n", err.Error())
-			return
-		}
-		// g.Print()
+	g, err := grid.Generate()
+	if err != nil {
+		fmt.Printf("%+v\n", err.Error())
+		return
 	}
+	g.Print()
 }

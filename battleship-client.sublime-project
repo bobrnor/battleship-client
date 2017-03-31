@@ -1,0 +1,24 @@
+{
+	"folders":
+	[
+		{
+			"path": "."
+		}
+	],
+    "settings":
+    {
+        "GoRename": {
+            "gorename_env": {"PATH": "/Users/bobrnor/Development/Pets/battleship-client:/Users/bobrnor/Development/Pets/battleship-client/bin"},
+        },
+    },
+    "build_systems":
+    [
+        {
+            "name": "battleship-client",
+            "cmd": ["/usr/local/bin/go", "run", "/Users/bobrnor/Development/Pets/battleship-client/src/bobrnor.com/battleship/battleship.go"],
+            "env": {"GOPATH": "/Users/bobrnor/Development/Pets/battleship-client"},
+            "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
+            "selector": "source.go"
+        }
+    ]
+}

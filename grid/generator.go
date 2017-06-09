@@ -100,11 +100,11 @@ func (g *generator) isSubArrangementValid(lastShipIndex int) bool {
 }
 
 func (g *generator) grid() Grid {
-	grid := Grid{}
+	var grid Grid
 	for _, ship := range g.ships {
-		for x := ship.Left; x <= ship.Right; x++ {
-			for y := ship.Top; y <= ship.Bottom; y++ {
-				grid[x][y] = true
+		for x := uint(ship.Left); x <= uint(ship.Right); x++ {
+			for y := uint(ship.Top); y <= uint(ship.Bottom); y++ {
+				grid.Set(x, y)
 			}
 		}
 	}

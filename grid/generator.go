@@ -20,23 +20,15 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-func Generate() (Grid, error) {
+func Generate() (*Grid, error) {
 	g := generator{}
 
 	g.randomizeSizes()
 	if err := g.generateArrangement(); err != nil {
-		return Grid{}, err
+		return nil, err
 	}
 
 	return g.grid(), nil
-}
-
-func (g *generator) generateArrangement() error {
-	g.initArrangement()
-	if err := g.findValidArrangement(); err != nil {
-		return err
-	}
-	return nil
 }
 
 func (g *generator) randomizeSizes() {
@@ -47,11 +39,18 @@ func (g *generator) randomizeSizes() {
 	}
 }
 
+func (g *generator) generateArrangement() error {
+	g.initArrangement()
+	if err := g.findValidArrangement(); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (g *generator) initArrangement() {
 	g.ships = []*ship{}
 	for i := 0; i < 10; i++ {
-		sizeIndex := g.sizes[i]
-		size := sizes[sizeIndex]
+		size := g.sizes[i]
 		g.ships = append(g.ships, NewShip(size))
 	}
 }
@@ -73,15 +72,6 @@ func (g *generator) findValidArrangement() error {
 	return nil
 }
 
-func (g *generator) findNextPosition(shipIndex int) bool {
-	ship := g.ships[shipIndex]
-	if !ship.FindNextPosition() {
-		return false
-	}
-	g.ships[shipIndex] = ship
-	return true
-}
-
 func (g *generator) isSubArrangementValid(lastShipIndex int) bool {
 	ship := g.ships[lastShipIndex]
 
@@ -99,7 +89,12 @@ func (g *generator) isSubArrangementValid(lastShipIndex int) bool {
 	return true
 }
 
-func (g *generator) grid() Grid {
+func (g *generator) findNextPosition(shipIndex int) bool {
+	ship := g.ships[shipIndex]
+	return ship.FindNextPosition()
+}
+
+func (g *generator) grid() *Grid {
 	var grid Grid
 	for _, ship := range g.ships {
 		for x := uint(ship.Left); x <= uint(ship.Right); x++ {
@@ -108,5 +103,5 @@ func (g *generator) grid() Grid {
 			}
 		}
 	}
-	return grid
+	return &grid
 }

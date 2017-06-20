@@ -12,7 +12,7 @@ import (
 type Client struct {
 	UID         string
 	RoomUID     string
-	Battlefield grid.Grid
+	Battlefield *grid.Grid
 
 	seq    uint64
 	seqSet bool

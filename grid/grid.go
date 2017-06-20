@@ -31,4 +31,5 @@ func (g *Grid) Print() {
 		}
 		fmt.Printf("\n")
 	}
+	fmt.Printf("\n\n")
 }

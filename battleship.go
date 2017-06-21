@@ -1,9 +1,9 @@
 package main
 
 import (
+	"log"
+
 	"git.nulana.com/bobrnor/battleship-client/client"
-	"go.uber.org/zap"
-	"git.nulana.com/bobrnor/battleship-client/grid"
 )
 
 var (
@@ -11,30 +11,20 @@ var (
 )
 
 func main() {
-	setupLogger()
+	c := client.NewClient()
+	c.Auth()
+	for c.Error() == nil && len(c.RoomUID) == 0 {
+		c.SearchRoom()
+	}
+	//c.ConfirmRoom()
+	c.CreateBattlefield()
+	c.StartGame()
+	c.Longpoll()
+	c.Turn()
+	c.Longpoll()
 
-	 g, _ := grid.Generate()
-	 g.Print()
-
-	//c := client.NewClient()
-	//c.Auth()
-	//for c.Error() == nil && len(c.RoomUID) == 0 {
-	//	c.SearchRoom()
-	//}
-	////c.ConfirmRoom()
-	//c.CreateBattlefield()
-	//c.StartGame()
-	//c.Longpoll()
-	//c.Turn()
-	//c.Longpoll()
-	//
-	//if c.Error() != nil {
-	//	zap.S().Errorf("Can't %+v", c.Error())
-	//	return
-	//}
-}
-
-func setupLogger() {
-	logger, _ := zap.NewProduction()
-	zap.ReplaceGlobals(logger)
+	if c.Error() != nil {
+		log.Printf("Can't %+v", c.Error())
+		return
+	}
 }

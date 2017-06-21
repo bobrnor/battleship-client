@@ -4,9 +4,10 @@ import (
 	"git.nulana.com/bobrnor/battleship-client/grid"
 	"git.nulana.com/bobrnor/json.git"
 
+	"log"
+
 	"github.com/hashicorp/packer/common/uuid"
 	"github.com/pkg/errors"
-	"go.uber.org/zap"
 )
 
 type Client struct {
@@ -56,7 +57,7 @@ func (c *Client) Auth() {
 		return
 	}
 
-	zap.S().Infof("Response read %+v", response)
+	log.Printf("Response read %+v", response)
 
 	if response.Status != 0 {
 		c.err = errors.Errorf("Bad status %+v", response.Status)
@@ -90,7 +91,7 @@ func (c *Client) SearchRoom() {
 		return
 	}
 
-	zap.S().Infof("Response read %+v", response)
+	log.Printf("Response read %+v", response)
 
 	if response.Status != 0 {
 		c.err = errors.Errorf("Bad status %+v", response.Status)
@@ -121,7 +122,7 @@ func (c *Client) ConfirmRoom() {
 		return
 	}
 
-	zap.S().Infof("Response read %+v", response)
+	log.Printf("Response read %+v", response)
 
 	if response.Status != 0 {
 		c.err = errors.Errorf("Bad status %+v", response.Status)
@@ -166,7 +167,7 @@ func (c *Client) StartGame() {
 		return
 	}
 
-	zap.S().Infof("Response read %+v", response)
+	log.Printf("Response read %+v", response)
 
 	if response.Status != 0 {
 		c.err = errors.Errorf("Bad status %+v", response.Status)
@@ -195,7 +196,7 @@ func (c *Client) Longpoll() {
 		return
 	}
 
-	zap.S().Infof("Response read %+v", response)
+	log.Printf("Response read %+v", response)
 
 	if status, ok := response["status"].(float64); !ok || status != 0 {
 		c.err = errors.Errorf("Bad status %+v", status)
@@ -224,7 +225,7 @@ func (c *Client) Turn() {
 		return
 	}
 
-	zap.S().Infof("Response read %+v", response)
+	log.Printf("Response read %+v", response)
 
 	if response.Status != 0 {
 		c.err = errors.Errorf("Bad status %+v", response.Status)

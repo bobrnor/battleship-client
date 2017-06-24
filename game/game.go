@@ -6,7 +6,7 @@ import (
 
 	"log"
 
-	"git.nulana.com/bobrnor/battleship-client/grid"
+	"git.nulana.com/bobrnor/battleship-grid.git"
 	json "git.nulana.com/bobrnor/json.git"
 	"github.com/hashicorp/packer/common/uuid"
 	"github.com/pkg/errors"
@@ -278,20 +278,7 @@ func (g *Game) checkTurn(x, y uint) bool {
 		return false
 	}
 
-	pos := y*10 + x
-	if pos > 99 {
-		return false
-	}
-
-	bytePos := pos / 8
-	byte := g.Grid[bytePos]
-
-	bitPos := pos % 8
-	if byte&(1<<bitPos) != 0 {
-		return true
-	}
-
-	return false
+	return g.Grid.Get(x, y)
 }
 
 func (g *Game) checkResponseError(err ResponseError) {

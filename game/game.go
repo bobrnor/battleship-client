@@ -22,6 +22,8 @@ type Game struct {
 	longpollClient *LongpollClient
 	jsonClient     json.Client
 	err            error
+
+	gameOverChan chan struct{}
 }
 
 type ResponseError struct {
@@ -38,20 +40,31 @@ const (
 	searchResultType = "search_result"
 	gameType         = "game"
 	opponentTurnType = "opponent_turn"
+	gameOverType     = "game_over"
 )
 
 func NewGame() *Game {
 	game := &Game{
-		UID:        uuid.TimeOrderedUUID(),
-		jsonClient: json.Client{},
+		UID:          uuid.TimeOrderedUUID(),
+		jsonClient:   json.Client{},
+		gameOverChan: make(chan struct{}, 1),
 	}
 	return game
 }
 
-func (g *Game) Play() {
+func (g *Game) Play() <-chan struct{} {
 	log.Printf("Starting game `%s`", g.UID)
 	g.auth()
 	g.searchGame()
+	g.checkError()
+	return g.gameOverChan
+}
+
+func (g *Game) stop() {
+	select {
+	case g.gameOverChan <- struct{}{}:
+	default:
+	}
 }
 
 func (g *Game) auth() {
@@ -133,9 +146,13 @@ func (g *Game) LongpollMessageReceived(message map[string]interface{}) {
 		g.startDone(message)
 	case opponentTurnType:
 		g.opponentTurn(message)
+	case gameOverType:
+		g.gameOver(message)
 	default:
 		log.Printf("Unknown longpoll message type %s", messageType)
 	}
+
+	g.checkError()
 }
 
 func (g *Game) searchDone(message map[string]interface{}) {
@@ -240,8 +257,11 @@ func (g *Game) afterTurn(result string) {
 		return
 	}
 
-	if result == "hit" {
+	switch result {
+	case "hit":
 		g.turn()
+	case "win":
+		g.stop()
 	}
 }
 
@@ -281,6 +301,17 @@ func (g *Game) checkTurn(x, y uint) bool {
 	return g.Grid.Get(x, y)
 }
 
+func (g *Game) gameOver(message map[string]interface{}) {
+	g.Lock()
+	defer g.Unlock()
+
+	if g.err != nil {
+		return
+	}
+
+	g.stop()
+}
+
 func (g *Game) checkResponseError(err ResponseError) {
 	if g.err != nil {
 		return
@@ -304,4 +335,14 @@ func (g *Game) doRequest(path string, data interface{}, response interface{}) {
 	}
 
 	log.Printf("Response read %+v", response)
+}
+
+func (g *Game) checkError() {
+	g.Lock()
+	defer g.Unlock()
+
+	if g.err != nil {
+		log.Printf("Error: %+v", g.err.Error())
+		g.stop()
+	}
 }

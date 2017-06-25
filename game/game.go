@@ -6,6 +6,8 @@ import (
 
 	"log"
 
+	"time"
+
 	"git.nulana.com/bobrnor/battleship-grid.git"
 	json "git.nulana.com/bobrnor/json.git"
 	"github.com/hashicorp/packer/common/uuid"
@@ -226,6 +228,9 @@ func (g *Game) startRequest() interface{} {
 }
 
 func (g *Game) turn() {
+	// throttling
+	<-time.After(1 * time.Second)
+
 	request := g.turnRequest()
 
 	var response struct {

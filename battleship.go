@@ -10,6 +10,9 @@ import (
 func main() {
 	rand.Seed(time.Now().Unix())
 
-	game := game.NewGame()
-	<-game.Play()
+	for {
+		game := game.NewGame()
+		<-game.Play()
+		<-time.After(5 * time.Second)
+	}
 }

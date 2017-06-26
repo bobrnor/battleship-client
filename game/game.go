@@ -21,6 +21,9 @@ type Game struct {
 	RoomUID string
 	Grid    *grid.Grid
 
+	turns *grid.Grid
+	hits  *grid.Grid
+
 	longpollClient *LongpollClient
 	jsonClient     json.Client
 	err            error
@@ -34,10 +37,10 @@ type ResponseError struct {
 }
 
 const (
-	authPath   = "http://0.0.0.0:8000/auth"
-	searchPath = "http://0.0.0.0:8000/game/search"
-	startPath  = "http://0.0.0.0:8000/game/start"
-	turnPath   = "http://0.0.0.0:8000/game/turn"
+	authPath   = "http://172.25.0.3:80/auth"
+	searchPath = "http://172.25.0.3:80/game/search"
+	startPath  = "http://172.25.0.3:80/game/start"
+	turnPath   = "http://172.25.0.3:80/game/turn"
 
 	searchResultType = "search_result"
 	gameType         = "game"
@@ -130,7 +133,7 @@ func (g *Game) searchRequest() interface{} {
 }
 
 func (g *Game) LongpollMessageReceived(message map[string]interface{}) {
-	log.Printf("Longpoll message received %+v", message)
+	//log.Printf("Longpoll message received %+v", message)
 
 	if len(message) == 0 {
 		return
@@ -205,6 +208,8 @@ func (g *Game) generateGrid() {
 	gr.Print()
 
 	g.Grid = gr
+	g.hits = &grid.Grid{}
+	g.turns = &grid.Grid{}
 }
 
 func (g *Game) startGame() {
@@ -231,6 +236,12 @@ func (g *Game) turn() {
 	// throttling
 	<-time.After(1 * time.Second)
 
+	if g.turns.IsFull() {
+		g.err = errors.Errorf("No turns left")
+		g.stop()
+		return
+	}
+
 	request := g.turnRequest()
 
 	var response struct {
@@ -245,11 +256,21 @@ func (g *Game) turn() {
 }
 
 func (g *Game) turnRequest() map[string]interface{} {
-	coord := map[string]interface{}{
-		"x": uint(rand.Intn(10)),
-		"y": uint(rand.Intn(10)),
+	var x, y uint
+	for {
+		x = uint(rand.Intn(10))
+		y = uint(rand.Intn(10))
+		if !g.turns.Get(x, y) {
+			g.turns.Set(x, y)
+			break
+		}
 	}
-	log.Printf("My turn: %+v", coord)
+
+	coord := map[string]interface{}{
+		"x": x,
+		"y": y,
+	}
+	//log.Printf("My turn: %+v", coord)
 	return map[string]interface{}{
 		"client_uid": g.UID,
 		"room_uid":   g.RoomUID,
@@ -291,11 +312,13 @@ func (g *Game) opponentTurn(message map[string]interface{}) {
 	}
 
 	if !g.checkTurn(uint(x), uint(y)) {
-		log.Printf("Opponent missed, my turn")
+		//log.Printf("Opponent missed, my turn")
 		g.turn()
 	} else {
-		log.Printf("Opponent hit")
+		//log.Printf("Opponent hit")
 	}
+
+	g.Grid.PrintWithHitsOverlay(g.hits)
 }
 
 func (g *Game) checkTurn(x, y uint) bool {
@@ -303,6 +326,7 @@ func (g *Game) checkTurn(x, y uint) bool {
 		return false
 	}
 
+	g.hits.Set(x, y)
 	return g.Grid.Get(x, y)
 }
 
@@ -339,7 +363,7 @@ func (g *Game) doRequest(path string, data interface{}, response interface{}) {
 		return
 	}
 
-	log.Printf("Response read %+v", response)
+	//log.Printf("Response read %+v", response)
 }
 
 func (g *Game) checkError() {

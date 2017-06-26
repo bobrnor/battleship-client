@@ -23,7 +23,7 @@ type LongpollClient struct {
 }
 
 const (
-	longpollPath = "http://0.0.0.0:8000/longpoll"
+	longpollPath = "http://172.25.0.3:80/longpoll"
 )
 
 func NewLongpollClient(uid string, fn LongpollClientFunc) *LongpollClient {
@@ -51,7 +51,7 @@ func (c *LongpollClient) loop() {
 			log.Fatalf("Can't make lp request %+v", err.Error())
 		}
 
-		log.Printf("LP %+v", response)
+		//log.Printf("LP %+v", response)
 
 		c.Lock()
 		c.seq = response.Seq

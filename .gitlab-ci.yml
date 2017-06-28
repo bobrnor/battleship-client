@@ -1,8 +1,9 @@
-image: registry.nulana.com/bobrnor/battleship-builder:latest
+image: golang
 
 stages:
   - test
-  - build
+  - build-app
+  - build-image
 
 before_script:
   - eval $(ssh-agent -s)
@@ -29,14 +30,29 @@ test:
     - cd $HOME/gopath/src/git.nulana.com/bobrnor/battleship-client
     - go test ./...
 
-build:
-  stage: build
+build-app:
+  stage: build-app
+  artifacts:
+    paths: $HOME/gopath/src/git.nulana.com/bobrnor/battleship-client/build/battleship
+    expire_in: 1 hrs
   script:
     - cp -R $CURRENT_BUILD_PATH/* $HOME/gopath/src/git.nulana.com/bobrnor/battleship-client
     - cd $HOME/gopath
     - go get ...
     - cd $HOME/gopath/src/git.nulana.com/bobrnor/battleship-client/build
     - GOOS=linux GOARCH=amd64 go build ../battleship.go
+    - docker build -t registry.nulana.com/bobrnor/battleship-client -f Dockerfile .
+    - docker login registry.nulana.com -u danil@nulana.com -p "$REGISTRY_PASSWORD"
+    - docker push registry.nulana.com/bobrnor/battleship-client:latest
+    - docker logout registry.nulana.com
+
+build-image:
+  image: docker
+  services: docker:dind
+  stage: build-image
+  script:
+    - cd $HOME/gopath/src/git.nulana.com/bobrnor/battleship-client/build
+    - ls -l
     - docker build -t registry.nulana.com/bobrnor/battleship-client -f Dockerfile .
     - docker login registry.nulana.com -u danil@nulana.com -p "$REGISTRY_PASSWORD"
     - docker push registry.nulana.com/bobrnor/battleship-client:latest

@@ -1,5 +1,9 @@
 image: golang
 
+stages:
+  - test
+  - build
+
 before_script:
   - eval $(ssh-agent -s)
   - ssh-add <(echo "$SSH_PRIVATE_KEY")
@@ -17,9 +21,20 @@ before_script:
   - which go
 
 test:
+  stage: test
   script:
     - cp -R $CURRENT_BUILD_PATH/* $HOME/gopath/src/git.nulana.com/bobrnor/battleship-client
     - cd $HOME/gopath
     - go get ...
     - cd $HOME/gopath/src/git.nulana.com/bobrnor/battleship-client
     - go test ./...
+
+build:
+  stage: build
+  script:
+    - cd $HOME/gopath/src/git.nulana.com/bobrnor/battleship-client/build
+    - GOOS=linux GOARCH=amd64 go build ../battleship.go
+    - docker build -t registry.nulana.com/bobrnor/battleship-client -f Dockerfile .
+    - docker login registry.nulana.com -u danil@nulana.com -p "$REGISTRY_PASSWORD"
+    - docker push registry.nulana.com/bobrnor/battleship-client:latest
+    - docker logout registry.nulana.com

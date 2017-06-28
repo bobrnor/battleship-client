@@ -1,4 +1,4 @@
-image: docker pull registry.nulana.com/bobrnor/battleship-builder:latest
+image: registry.nulana.com/bobrnor/battleship-builder:latest
 
 stages:
   - test

@@ -33,7 +33,8 @@ test:
 build-app:
   stage: build-app
   artifacts:
-    paths: $HOME/gopath/src/git.nulana.com/bobrnor/battleship-client/build/battleship
+    paths:
+      - $HOME/gopath/src/git.nulana.com/bobrnor/battleship-client/build/battleship
     expire_in: 1 hrs
   script:
     - cp -R $CURRENT_BUILD_PATH/* $HOME/gopath/src/git.nulana.com/bobrnor/battleship-client

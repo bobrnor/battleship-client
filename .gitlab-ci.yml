@@ -49,7 +49,8 @@ build-app:
 
 build-image:
   image: docker
-  services: docker:dind
+  services:
+    - docker:dind
   stage: build-image
   script:
     - cd $HOME/gopath/src/git.nulana.com/bobrnor/battleship-client/build

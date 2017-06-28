@@ -7,7 +7,7 @@ stages:
 
 test:
   stage: test
-  script:
+  before_script:
     - eval $(ssh-agent -s)
     - ssh-add <(echo "$SSH_PRIVATE_KEY")
     - mkdir -p ~/.ssh
@@ -22,6 +22,7 @@ test:
     - go version
     - go env
     - which go
+  script:
     - cp -R $CURRENT_BUILD_PATH/* $HOME/gopath/src/git.nulana.com/bobrnor/battleship-client
     - cd $HOME/gopath
     - go get ...
@@ -34,7 +35,7 @@ build-app:
     paths:
       - $HOME/gopath/src/git.nulana.com/bobrnor/battleship-client/build/battleship
     expire_in: 1 hrs
-  script:
+  before_script:
     - eval $(ssh-agent -s)
     - ssh-add <(echo "$SSH_PRIVATE_KEY")
     - mkdir -p ~/.ssh
@@ -49,6 +50,7 @@ build-app:
     - go version
     - go env
     - which go
+  script:
     - cp -R $CURRENT_BUILD_PATH/* $HOME/gopath/src/git.nulana.com/bobrnor/battleship-client
     - cd $HOME/gopath
     - go get ...
@@ -62,7 +64,8 @@ build-image:
   stage: build-image
   script:
     - docker info
-    - cd $HOME/gopath/src/git.nulana.com/bobrnor/battleship-client/build
+    - ls -l
+    - cd build
     - ls -l
     - docker build -t registry.nulana.com/bobrnor/battleship-client -f Dockerfile .
     - docker login registry.nulana.com -u danil@nulana.com -p "$REGISTRY_PASSWORD"

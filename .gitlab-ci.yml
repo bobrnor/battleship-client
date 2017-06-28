@@ -42,10 +42,6 @@ build-app:
     - go get ...
     - cd $HOME/gopath/src/git.nulana.com/bobrnor/battleship-client/build
     - GOOS=linux GOARCH=amd64 go build ../battleship.go
-    - docker build -t registry.nulana.com/bobrnor/battleship-client -f Dockerfile .
-    - docker login registry.nulana.com -u danil@nulana.com -p "$REGISTRY_PASSWORD"
-    - docker push registry.nulana.com/bobrnor/battleship-client:latest
-    - docker logout registry.nulana.com
 
 build-image:
   image: docker

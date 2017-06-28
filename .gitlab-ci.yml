@@ -5,25 +5,23 @@ stages:
   - build-app
   - build-image
 
-before_script:
-  - eval $(ssh-agent -s)
-  - ssh-add <(echo "$SSH_PRIVATE_KEY")
-  - mkdir -p ~/.ssh
-  - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-  - echo -e "Host git.nulana.com\n\tHostName git.nulana.com\n\tPort 2221\n\tUser git\n\n" >> ~/.ssh/config
-  - export CURRENT_BUILD_PATH=$(pwd)
-  - rm -rf $HOME/gopath
-  - mkdir -p $HOME/gopath/src/git.nulana.com/bobrnor/battleship-client
-  - export GOPATH=$HOME/gopath
-  - export PATH=$PATH:$GOPATH/bin
-  - echo $PATH
-  - go version
-  - go env
-  - which go
-
 test:
   stage: test
   script:
+    - eval $(ssh-agent -s)
+    - ssh-add <(echo "$SSH_PRIVATE_KEY")
+    - mkdir -p ~/.ssh
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    - echo -e "Host git.nulana.com\n\tHostName git.nulana.com\n\tPort 2221\n\tUser git\n\n" >> ~/.ssh/config
+    - export CURRENT_BUILD_PATH=$(pwd)
+    - rm -rf $HOME/gopath
+    - mkdir -p $HOME/gopath/src/git.nulana.com/bobrnor/battleship-client
+    - export GOPATH=$HOME/gopath
+    - export PATH=$PATH:$GOPATH/bin
+    - echo $PATH
+    - go version
+    - go env
+    - which go
     - cp -R $CURRENT_BUILD_PATH/* $HOME/gopath/src/git.nulana.com/bobrnor/battleship-client
     - cd $HOME/gopath
     - go get ...
@@ -37,6 +35,20 @@ build-app:
       - $HOME/gopath/src/git.nulana.com/bobrnor/battleship-client/build/battleship
     expire_in: 1 hrs
   script:
+    - eval $(ssh-agent -s)
+    - ssh-add <(echo "$SSH_PRIVATE_KEY")
+    - mkdir -p ~/.ssh
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    - echo -e "Host git.nulana.com\n\tHostName git.nulana.com\n\tPort 2221\n\tUser git\n\n" >> ~/.ssh/config
+    - export CURRENT_BUILD_PATH=$(pwd)
+    - rm -rf $HOME/gopath
+    - mkdir -p $HOME/gopath/src/git.nulana.com/bobrnor/battleship-client
+    - export GOPATH=$HOME/gopath
+    - export PATH=$PATH:$GOPATH/bin
+    - echo $PATH
+    - go version
+    - go env
+    - which go
     - cp -R $CURRENT_BUILD_PATH/* $HOME/gopath/src/git.nulana.com/bobrnor/battleship-client
     - cd $HOME/gopath
     - go get ...
@@ -49,6 +61,7 @@ build-image:
     - docker:dind
   stage: build-image
   script:
+    - docker info
     - cd $HOME/gopath/src/git.nulana.com/bobrnor/battleship-client/build
     - ls -l
     - docker build -t registry.nulana.com/bobrnor/battleship-client -f Dockerfile .

@@ -1,5 +1,9 @@
 image: docker
 
+services:
+  - docker:dind
+  - golang
+
 stages:
   - test
   - build

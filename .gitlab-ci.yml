@@ -1,7 +1,4 @@
-image: golang
-
-services:
-  - docker:dind
+image: docker pull registry.nulana.com/bobrnor/battleship-builder:latest
 
 stages:
   - test

@@ -32,6 +32,9 @@ test:
 build:
   stage: build
   script:
+    - cp -R $CURRENT_BUILD_PATH/* $HOME/gopath/src/git.nulana.com/bobrnor/battleship-client
+    - cd $HOME/gopath
+    - go get ...
     - cd $HOME/gopath/src/git.nulana.com/bobrnor/battleship-client/build
     - GOOS=linux GOARCH=amd64 go build ../battleship.go
     - docker build -t registry.nulana.com/bobrnor/battleship-client -f Dockerfile .

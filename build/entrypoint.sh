@@ -8,6 +8,10 @@ InitDataDir()
 	mkdir -p /external/logs \
 	&& find /external -type d -exec chmod 755 {} + \
 	&& find /external -type f -exec chmod 644 {} +
+
+	ls -l
+	ls -l /internal
+	ls -l /internal/bin
 }
 
 InitDataDir

@@ -1,5 +1,4 @@
-#FROM alpine:3.6
-FROM ubuntu
+FROM alpine:3.6
 MAINTAINER danil@nulana.com
 
 COPY battleship /internal/bin/battleship_client

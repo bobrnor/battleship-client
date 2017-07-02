@@ -37,10 +37,10 @@ type ResponseError struct {
 }
 
 const (
-	authPath   = "http://172.25.0.3:80/auth"
-	searchPath = "http://172.25.0.3:80/game/search"
-	startPath  = "http://172.25.0.3:80/game/start"
-	turnPath   = "http://172.25.0.3:80/game/turn"
+	authPath   = "http://battleship_server.1:80/auth"
+	searchPath = "http://battleship_server.1:80/game/search"
+	startPath  = "http://battleship_server.1:80/game/start"
+	turnPath   = "http://battleship_server.1:80/game/turn"
 
 	searchResultType = "search_result"
 	gameType         = "game"

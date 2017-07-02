@@ -23,7 +23,7 @@ type LongpollClient struct {
 }
 
 const (
-	longpollPath = "http://battleship_server.1:80/longpoll"
+	longpollPath = "http://battleship_server:80/longpoll"
 )
 
 func NewLongpollClient(uid string, fn LongpollClientFunc) *LongpollClient {
